@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package BookingService;
+
+option go_package = "github.com/KhetwalDevesh/book-my-seat/stubs/booking-service/v1";
+
+service BookingService {
+  rpc PurchaseTicket(PurchaseTicketRequest) returns (PurchaseTicketResponse);
+  rpc GetReceipt(GetReceiptRequest) returns (GetReceiptResponse);
+  rpc GetSeatAllocated(GetSeatAllocatedRequest) returns (GetSeatAllocatedResponse);
+  rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse);
+  rpc ModifyUserSeat(ModifyUserSeatRequest) returns (ModifyUserSeatResponse);
+}
+
+message PurchaseTicketRequest{
+  User user = 1;
+  SeatSection seat_section = 2;
+  uint32 seat_number = 3;
+}
+
+message PurchaseTicketResponse{
+  Ticket ticket = 1;
+}
+
+message GetReceiptRequest{
+  User user = 1;
+}
+
+message GetReceiptResponse{
+  Ticket ticket = 1;
+}
+
+message GetSeatAllocatedRequest{
+  SeatSection seat_section = 1;
+}
+
+message GetSeatAllocatedResponse{
+  map<string, User> seat_allocated = 1;
+}
+
+message RemoveUserRequest{
+  uint64 user_id = 1;
+}
+
+message RemoveUserResponse{
+  // message whether user removed successfully or not
+  string msg = 1;
+}
+
+message ModifyUserSeatRequest{
+  uint64 user_id = 1;
+  SeatSection new_seat_section = 2;
+  uint32 new_seat_number = 3;
+}
+
+message ModifyUserSeatResponse{
+  // message whether user seat updated successfully or not
+  string msg = 1;
+}
+
+message User {
+  uint64 id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+}
+
+message Ticket {
+  string from = 1;
+  string to = 2;
+  User user = 3;
+  float price_paid = 4;
+  SeatSection seat_section = 5;
+  uint32 seat_number = 6;
+}
+
+enum SeatSection{
+  A = 0;
+  B = 1;
+}
