@@ -39,7 +39,7 @@ message GetSeatAllocatedResponse{
 }
 
 message RemoveUserRequest{
-  uint64 user_id = 1;
+  string email = 1;
 }
 
 message RemoveUserResponse{
@@ -48,7 +48,7 @@ message RemoveUserResponse{
 }
 
 message ModifyUserSeatRequest{
-  uint64 user_id = 1;
+  string email = 1;
   SeatSection new_seat_section = 2;
   uint32 new_seat_number = 3;
 }
