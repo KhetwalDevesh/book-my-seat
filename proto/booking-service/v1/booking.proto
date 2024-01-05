@@ -7,7 +7,7 @@ option go_package = "github.com/KhetwalDevesh/book-my-seat/stubs/booking-service
 service BookingService {
   rpc PurchaseTicket(PurchaseTicketRequest) returns (PurchaseTicketResponse);
   rpc GetReceipt(GetReceiptRequest) returns (GetReceiptResponse);
-  rpc GetSeatAllocated(GetSeatAllocatedRequest) returns (GetSeatAllocatedResponse);
+  rpc GetUsersAndSeatAllocated(GetUsersAndSeatAllocatedRequest) returns (GetUsersAndSeatAllocatedResponse);
   rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse);
   rpc ModifyUserSeat(ModifyUserSeatRequest) returns (ModifyUserSeatResponse);
 }
@@ -23,19 +23,19 @@ message PurchaseTicketResponse{
 }
 
 message GetReceiptRequest{
-  User user = 1;
+   string email = 1;
 }
 
 message GetReceiptResponse{
   Ticket ticket = 1;
 }
 
-message GetSeatAllocatedRequest{
+message GetUsersAndSeatAllocatedRequest{
   SeatSection seat_section = 1;
 }
 
-message GetSeatAllocatedResponse{
-  map<string, User> seat_allocated = 1;
+message GetUsersAndSeatAllocatedResponse{
+  map<string, Ticket> seat_allocated = 1;
 }
 
 message RemoveUserRequest{

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	pb "github.com/KhetwalDevesh/book-my-seat/stubs/booking-service/v1"
 	"google.golang.org/grpc"
@@ -14,11 +15,129 @@ import (
 
 var serverAddress = "0.0.0.0:50051"
 
-func PurchaseTicket(client pb.BookingServiceClient)           {}
-func GetReceipt(client pb.BookingServiceClient)               {}
-func GetUsersAndSeatAllocated(client pb.BookingServiceClient) {}
-func RemoveUser(client pb.BookingServiceClient)               {}
-func ModifyUserSeat(client pb.BookingServiceClient)           {}
+func PurchaseTicket(client pb.BookingServiceClient) {
+	reader := bufio.NewReader(os.Stdin)
+	// Get input for User fields
+	fmt.Println("Enter User Details : ")
+	fmt.Print("Enter First Name : ")
+	firstName, _ := reader.ReadString('\n')
+	firstName = strings.TrimSpace(firstName)
+
+	fmt.Print("Enter Last Name : ")
+	lastName, _ := reader.ReadString('\n')
+	lastName = strings.TrimSpace(lastName)
+
+	fmt.Print("Enter Email : ")
+	email, _ := reader.ReadString('\n')
+	email = strings.TrimSpace(email)
+
+	user := &pb.User{
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+	}
+
+	// Get input for SeatSection field
+	fmt.Print("Choose Section ( A or B ) : ")
+	seatSectionStr, _ := reader.ReadString('\n')
+	seatSectionStr = strings.TrimSpace(seatSectionStr)
+	seatSection := pb.SeatSection(pb.SeatSection_value[strings.ToUpper(seatSectionStr)])
+	if seatSection < 0 || seatSection > 1 {
+		log.Fatalf("Invalid seat section : %s", seatSectionStr)
+	}
+
+	// Get input for SeatNumber field
+	fmt.Print("Choose Seat Number from 1 to 50 : ")
+	seatNumberStr, _ := reader.ReadString('\n')
+	seatNumberStr = strings.TrimSpace(seatNumberStr)
+	seatNumber, err := strconv.ParseUint(seatNumberStr, 10, 32)
+	if err != nil {
+		log.Fatalf("Invalid Seat Number : %v", err)
+	}
+
+	// Finally call the grpc method PurchaseTicket
+	response, err := client.PurchaseTicket(context.Background(), &pb.PurchaseTicketRequest{
+		User:        user,
+		SeatSection: seatSection,
+		SeatNumber:  uint32(seatNumber),
+	})
+	if err != nil {
+		log.Fatalf("Error calling PurchaseTicket: %v", err.Error())
+	}
+	fmt.Printf("\nBooking Details:\n\n%+v\n\n", response)
+}
+
+func GetReceipt(client pb.BookingServiceClient) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter Email to get receipt : ")
+	email, _ := reader.ReadString('\n')
+	email = strings.TrimSpace(email)
+
+	// Call the grpc method GetReceipt
+	response, err := client.GetReceipt(context.Background(), &pb.GetReceiptRequest{Email: email})
+	if err != nil {
+		log.Fatalf("Error calling GetReceipt : %v", err)
+	}
+	fmt.Printf("\nReceipt Details:\n\n%+v\n\n", response)
+}
+
+func GetUsersAndSeatAllocated(client pb.BookingServiceClient) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Choose Section ( A or B ) : ")
+	seatSectionStr, _ := reader.ReadString('\n')
+	seatSectionStr = strings.TrimSpace(seatSectionStr)
+	seatSection := pb.SeatSection(pb.SeatSection_value[strings.ToUpper(seatSectionStr)])
+	log.Println("seatSection : ", seatSection)
+	// Call the grpc method GetUsersAndSeatAllocated
+	response, err := client.GetUsersAndSeatAllocated(context.Background(), &pb.GetUsersAndSeatAllocatedRequest{SeatSection: seatSection})
+	if err != nil {
+		log.Fatalf("Error calling GetUsersAndSeatAllocated : %v", err)
+	}
+	fmt.Printf("\nSeat allocated Details:\n\n%+v\n\n", response)
+}
+
+func RemoveUser(client pb.BookingServiceClient) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter Email of the User to be removed : ")
+	email, _ := reader.ReadString('\n')
+	email = strings.TrimSpace(email)
+
+	// Call the grpc method RemoveUser
+	response, err := client.RemoveUser(context.Background(), &pb.RemoveUserRequest{Email: email})
+	if err != nil {
+		log.Fatalf("Error calling RemoveUser : %v", err)
+	}
+	fmt.Printf("\nMessage :\n\n%+v\n\n", response)
+}
+
+func ModifyUserSeat(client pb.BookingServiceClient) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter Email of the User whose seat is to be updated : ")
+	email, _ := reader.ReadString('\n')
+	email = strings.TrimSpace(email)
+	fmt.Print("Enter the new SeatSection ( A or B ) : ")
+	seatSectionStr, _ := reader.ReadString('\n')
+	seatSectionStr = strings.TrimSpace(seatSectionStr)
+	seatSection := pb.SeatSection(pb.SeatSection_value[strings.ToUpper(seatSectionStr)])
+	fmt.Print("Enter the new SeatNumber (anywhere from 1 to 50 ) : ")
+	seatNumberStr, _ := reader.ReadString('\n')
+	seatNumberStr = strings.TrimSpace(seatNumberStr)
+	seatNumber, err := strconv.ParseUint(seatNumberStr, 10, 32)
+	if err != nil {
+		log.Fatalf("Invalid seat number")
+	}
+
+	// call the grpc method ModifyUserSeat
+	response, err := client.ModifyUserSeat(context.Background(), &pb.ModifyUserSeatRequest{
+		Email:          email,
+		NewSeatSection: seatSection,
+		NewSeatNumber:  uint32(seatNumber),
+	})
+	if err != nil {
+		log.Fatalf("Error calling ModifyUserRequest : %v", err)
+	}
+	fmt.Printf("\nMessage : \n\n%+v\n\n", response)
+}
 
 func main() {
 	conn, err := grpc.Dial(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))

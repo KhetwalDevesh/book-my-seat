@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type BookingServiceClient interface {
 	PurchaseTicket(ctx context.Context, in *PurchaseTicketRequest, opts ...grpc.CallOption) (*PurchaseTicketResponse, error)
 	GetReceipt(ctx context.Context, in *GetReceiptRequest, opts ...grpc.CallOption) (*GetReceiptResponse, error)
-	GetSeatAllocated(ctx context.Context, in *GetSeatAllocatedRequest, opts ...grpc.CallOption) (*GetSeatAllocatedResponse, error)
+	GetUsersAndSeatAllocated(ctx context.Context, in *GetUsersAndSeatAllocatedRequest, opts ...grpc.CallOption) (*GetUsersAndSeatAllocatedResponse, error)
 	RemoveUser(ctx context.Context, in *RemoveUserRequest, opts ...grpc.CallOption) (*RemoveUserResponse, error)
 	ModifyUserSeat(ctx context.Context, in *ModifyUserSeatRequest, opts ...grpc.CallOption) (*ModifyUserSeatResponse, error)
 }
@@ -55,9 +55,9 @@ func (c *bookingServiceClient) GetReceipt(ctx context.Context, in *GetReceiptReq
 	return out, nil
 }
 
-func (c *bookingServiceClient) GetSeatAllocated(ctx context.Context, in *GetSeatAllocatedRequest, opts ...grpc.CallOption) (*GetSeatAllocatedResponse, error) {
-	out := new(GetSeatAllocatedResponse)
-	err := c.cc.Invoke(ctx, "/BookingService.BookingService/GetSeatAllocated", in, out, opts...)
+func (c *bookingServiceClient) GetUsersAndSeatAllocated(ctx context.Context, in *GetUsersAndSeatAllocatedRequest, opts ...grpc.CallOption) (*GetUsersAndSeatAllocatedResponse, error) {
+	out := new(GetUsersAndSeatAllocatedResponse)
+	err := c.cc.Invoke(ctx, "/BookingService.BookingService/GetUsersAndSeatAllocated", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *bookingServiceClient) ModifyUserSeat(ctx context.Context, in *ModifyUse
 type BookingServiceServer interface {
 	PurchaseTicket(context.Context, *PurchaseTicketRequest) (*PurchaseTicketResponse, error)
 	GetReceipt(context.Context, *GetReceiptRequest) (*GetReceiptResponse, error)
-	GetSeatAllocated(context.Context, *GetSeatAllocatedRequest) (*GetSeatAllocatedResponse, error)
+	GetUsersAndSeatAllocated(context.Context, *GetUsersAndSeatAllocatedRequest) (*GetUsersAndSeatAllocatedResponse, error)
 	RemoveUser(context.Context, *RemoveUserRequest) (*RemoveUserResponse, error)
 	ModifyUserSeat(context.Context, *ModifyUserSeatRequest) (*ModifyUserSeatResponse, error)
 	mustEmbedUnimplementedBookingServiceServer()
@@ -104,8 +104,8 @@ func (UnimplementedBookingServiceServer) PurchaseTicket(context.Context, *Purcha
 func (UnimplementedBookingServiceServer) GetReceipt(context.Context, *GetReceiptRequest) (*GetReceiptResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetReceipt not implemented")
 }
-func (UnimplementedBookingServiceServer) GetSeatAllocated(context.Context, *GetSeatAllocatedRequest) (*GetSeatAllocatedResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSeatAllocated not implemented")
+func (UnimplementedBookingServiceServer) GetUsersAndSeatAllocated(context.Context, *GetUsersAndSeatAllocatedRequest) (*GetUsersAndSeatAllocatedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersAndSeatAllocated not implemented")
 }
 func (UnimplementedBookingServiceServer) RemoveUser(context.Context, *RemoveUserRequest) (*RemoveUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveUser not implemented")
@@ -162,20 +162,20 @@ func _BookingService_GetReceipt_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BookingService_GetSeatAllocated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSeatAllocatedRequest)
+func _BookingService_GetUsersAndSeatAllocated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsersAndSeatAllocatedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BookingServiceServer).GetSeatAllocated(ctx, in)
+		return srv.(BookingServiceServer).GetUsersAndSeatAllocated(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/BookingService.BookingService/GetSeatAllocated",
+		FullMethod: "/BookingService.BookingService/GetUsersAndSeatAllocated",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingServiceServer).GetSeatAllocated(ctx, req.(*GetSeatAllocatedRequest))
+		return srv.(BookingServiceServer).GetUsersAndSeatAllocated(ctx, req.(*GetUsersAndSeatAllocatedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -232,8 +232,8 @@ var BookingService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BookingService_GetReceipt_Handler,
 		},
 		{
-			MethodName: "GetSeatAllocated",
-			Handler:    _BookingService_GetSeatAllocated_Handler,
+			MethodName: "GetUsersAndSeatAllocated",
+			Handler:    _BookingService_GetUsersAndSeatAllocated_Handler,
 		},
 		{
 			MethodName: "RemoveUser",
