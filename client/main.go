@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-var serverAddress = "0.0.0.0:50051"
+var serverAddress = "book-my-seat:50051"
 
 func PurchaseTicket(client pb.BookingServiceClient) {
 	reader := bufio.NewReader(os.Stdin)
