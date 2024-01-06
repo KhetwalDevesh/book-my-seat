@@ -11,13 +11,6 @@ func (s *BookingServiceServer) PurchaseTicket(ctx context.Context, req *pb.Purch
 	seatSection := req.SeatSection
 	seatNumber := req.SeatNumber
 
-	if s.Tickets == nil {
-		s.Tickets = make(map[string]pb.Ticket)
-	}
-	if s.SeatMapping == nil {
-		s.SeatMapping = make(map[string]map[string]pb.Ticket)
-	}
-
 	// Check if user already purchased a ticket
 	_, exists := s.Tickets[req.User.Email]
 	if exists {
@@ -27,6 +20,11 @@ func (s *BookingServiceServer) PurchaseTicket(ctx context.Context, req *pb.Purch
 	// Check if the section matches the available sections in the train
 	if seatSection != pb.SeatSection_A && seatSection != pb.SeatSection_B {
 		return nil, fmt.Errorf("invalid seat section")
+	}
+
+	// Ensure that the map for the specific seat section is initialized
+	if s.SeatMapping[seatSection.String()] == nil {
+		s.SeatMapping[seatSection.String()] = make(map[string]pb.Ticket)
 	}
 
 	seatAlreadyOccupied := false
@@ -63,7 +61,6 @@ func (s *BookingServiceServer) PurchaseTicket(ctx context.Context, req *pb.Purch
 	// Store the ticket and seat allocation
 	s.Tickets[req.User.Email] = *ticket
 	s.SeatMapping[seatSection.String()][req.User.Email] = *ticket
-
 	return &pb.PurchaseTicketResponse{Ticket: ticket}, nil
 }
 
@@ -117,13 +114,6 @@ func (s *BookingServiceServer) ModifyUserSeat(ctx context.Context, req *pb.Modif
 	newSeatNumber := req.NewSeatNumber
 	userEmail := req.Email
 
-	if s.Tickets == nil {
-		s.Tickets = make(map[string]pb.Ticket)
-	}
-	if s.SeatMapping == nil {
-		s.SeatMapping = make(map[string]map[string]pb.Ticket)
-	}
-
 	_, exists := s.Tickets[userEmail]
 	if !exists {
 		return nil, fmt.Errorf("User not found!")
@@ -137,6 +127,11 @@ func (s *BookingServiceServer) ModifyUserSeat(ctx context.Context, req *pb.Modif
 	// Check if there are available seats, 50 taken for each section, just to put some limit
 	if newSeatNumber > 50 {
 		return nil, fmt.Errorf("Invalid seat number, only 50 seats exists")
+	}
+
+	// Ensure that the map for the specific seat section is initialized
+	if s.SeatMapping[newSeatSection.String()] == nil {
+		s.SeatMapping[newSeatSection.String()] = make(map[string]pb.Ticket)
 	}
 
 	seatAlreadyOccupied := false

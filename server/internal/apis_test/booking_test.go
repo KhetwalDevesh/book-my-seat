@@ -8,11 +8,6 @@ import (
 )
 
 func TestPurchaseTicket(t *testing.T) {
-	//server := &api.BookingServiceServer{
-	//	Tickets:     make(map[string]pb.Ticket),
-	//	SeatMapping: make(map[string]map[string]pb.Ticket),
-	//}
-
 	server := api.NewBookingServiceServer()
 	defer func() {
 		if r := recover(); r != nil {
@@ -61,9 +56,6 @@ func TestPurchaseTicket(t *testing.T) {
 }
 
 func TestGetReceipt(t *testing.T) {
-	//server := &api.BookingServiceServer{
-	//	Tickets: make(map[string]pb.Ticket),
-	//}
 	server := api.NewBookingServiceServer()
 	email := "john.doe@example.com"
 	expectedTicket := &pb.Ticket{
@@ -98,9 +90,6 @@ func TestGetReceipt(t *testing.T) {
 }
 
 func TestGetUsersAndSeatAllocated(t *testing.T) {
-	//server := &api.BookingServiceServer{
-	//	SeatMapping: make(map[string]map[string]pb.Ticket),
-	//}
 	server := api.NewBookingServiceServer()
 	userEmail := "john.doe@example.com"
 	expectedTicket := &pb.Ticket{
@@ -140,10 +129,6 @@ func TestGetUsersAndSeatAllocated(t *testing.T) {
 }
 
 func TestRemoveUser(t *testing.T) {
-	//server := &api.BookingServiceServer{
-	//	Tickets:     make(map[string]pb.Ticket),
-	//	SeatMapping: make(map[string]map[string]pb.Ticket),
-	//}
 	server := api.NewBookingServiceServer()
 	userEmail := "john.doe@example.com"
 	expectedTicket := &pb.Ticket{
@@ -183,10 +168,6 @@ func TestRemoveUser(t *testing.T) {
 }
 
 func TestModifyUserSeat(t *testing.T) {
-	//server := &api.BookingServiceServer{
-	//	Tickets:     make(map[string]pb.Ticket),
-	//	SeatMapping: make(map[string]map[string]pb.Ticket),
-	//}
 	server := api.NewBookingServiceServer()
 
 	userEmail := "john.doe@example.com"

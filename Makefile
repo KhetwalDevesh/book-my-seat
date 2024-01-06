@@ -11,3 +11,6 @@ build-server:
 
 build-client:
 	go build -o bin/client ./client
+
+run-test:
+	go test -v ./server/internal/apis_test
