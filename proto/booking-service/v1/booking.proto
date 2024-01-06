@@ -16,6 +16,7 @@ message PurchaseTicketRequest{
   User user = 1;
   SeatSection seat_section = 2;
   uint32 seat_number = 3;
+  float ticket_price = 4;
 }
 
 message PurchaseTicketResponse{

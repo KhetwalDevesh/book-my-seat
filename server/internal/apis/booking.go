@@ -5,27 +5,28 @@ import (
 	"fmt"
 	pb "github.com/KhetwalDevesh/book-my-seat/stubs/booking-service/v1"
 	"github.com/google/uuid"
-	"log"
 )
 
 func (s *BookingServiceServer) PurchaseTicket(ctx context.Context, req *pb.PurchaseTicketRequest) (*pb.PurchaseTicketResponse, error) {
 	seatSection := req.SeatSection
 	seatNumber := req.SeatNumber
 
+	if s.Tickets == nil {
+		s.Tickets = make(map[string]pb.Ticket)
+	}
+	if s.SeatMapping == nil {
+		s.SeatMapping = make(map[string]map[string]pb.Ticket)
+	}
+
 	// Check if user already purchased a ticket
 	_, exists := s.Tickets[req.User.Email]
 	if exists {
-		return nil, fmt.Errorf("User already have a ticket")
+		return nil, fmt.Errorf("User already booked a ticket")
 	}
 
 	// Check if the section matches the available sections in the train
 	if seatSection != pb.SeatSection_A && seatSection != pb.SeatSection_B {
 		return nil, fmt.Errorf("invalid seat section")
-	}
-
-	// Check if there are available seats, 50 taken for each seatSection, just to put some limit
-	if s.SeatCounter[seatSection.String()] >= 50 {
-		return nil, fmt.Errorf("all seats in seatSection %s are occupied", seatSection)
 	}
 
 	seatAlreadyOccupied := false
@@ -35,12 +36,8 @@ func (s *BookingServiceServer) PurchaseTicket(ctx context.Context, req *pb.Purch
 		}
 	}
 	if seatAlreadyOccupied {
-		log.Fatalf("Seat already occupied, choose some other")
 		return nil, fmt.Errorf("Seat already occupied, choose some other")
 	}
-
-	// Increment the seat counter and assign the seat number
-	s.SeatCounter[seatSection.String()]++
 
 	// Generate a unique ID for the user
 	userID, err := uuid.NewRandom()
@@ -58,7 +55,7 @@ func (s *BookingServiceServer) PurchaseTicket(ctx context.Context, req *pb.Purch
 			LastName:  req.User.LastName,
 			Email:     req.User.Email,
 		},
-		PricePaid:   20.0,
+		PricePaid:   req.TicketPrice,
 		SeatSection: seatSection,
 		SeatNumber:  seatNumber,
 	}
@@ -120,6 +117,13 @@ func (s *BookingServiceServer) ModifyUserSeat(ctx context.Context, req *pb.Modif
 	newSeatNumber := req.NewSeatNumber
 	userEmail := req.Email
 
+	if s.Tickets == nil {
+		s.Tickets = make(map[string]pb.Ticket)
+	}
+	if s.SeatMapping == nil {
+		s.SeatMapping = make(map[string]map[string]pb.Ticket)
+	}
+
 	_, exists := s.Tickets[userEmail]
 	if !exists {
 		return nil, fmt.Errorf("User not found!")
@@ -132,8 +136,7 @@ func (s *BookingServiceServer) ModifyUserSeat(ctx context.Context, req *pb.Modif
 
 	// Check if there are available seats, 50 taken for each section, just to put some limit
 	if newSeatNumber > 50 {
-		log.Fatalf("Invalid seat number, only 50 seats exists")
-		return nil, nil
+		return nil, fmt.Errorf("Invalid seat number, only 50 seats exists")
 	}
 
 	seatAlreadyOccupied := false
@@ -143,8 +146,7 @@ func (s *BookingServiceServer) ModifyUserSeat(ctx context.Context, req *pb.Modif
 		}
 	}
 	if seatAlreadyOccupied {
-		log.Fatalf("Seat already occupied, choose some other")
-		return nil, nil
+		return nil, fmt.Errorf("Seat already occupied, choose some other")
 	}
 
 	ticket, _ := s.Tickets[userEmail]

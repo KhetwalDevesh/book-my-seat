@@ -18,11 +18,11 @@ func main() {
 
 	log.Printf("Listening on %s\n", address)
 	grpcServer := grpc.NewServer()
-	pb.RegisterBookingServiceServer(grpcServer, &api.BookingServiceServer{
-		Tickets:     make(map[string]pb.Ticket),
-		SeatMapping: map[string]map[string]pb.Ticket{pb.SeatSection_A.String(): {}, pb.SeatSection_B.String(): {}},
-		SeatCounter: make(map[string]uint32),
-	})
+	//pb.RegisterBookingServiceServer(grpcServer, &api.BookingServiceServer{
+	//	Tickets:     make(map[string]pb.Ticket),
+	//	SeatMapping: map[string]map[string]pb.Ticket{pb.SeatSection_A.String(): {}, pb.SeatSection_B.String(): {}},
+	//})
+	pb.RegisterBookingServiceServer(grpcServer, api.NewBookingServiceServer())
 	if err := grpcServer.Serve(listen); err != nil {
 		log.Fatalf("Failed to serve : %v\n", err)
 	}

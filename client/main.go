@@ -55,6 +55,15 @@ func PurchaseTicket(client pb.BookingServiceClient) {
 		log.Fatalf("Invalid Seat Number : %v", err)
 	}
 
+	// Make the user to enter the price
+	fmt.Print("Enter the price of the ticket ( $20 ) : ")
+	ticketPriceStr, _ := reader.ReadString('\n')
+	ticketPriceStr = strings.TrimSpace(ticketPriceStr)
+	ticketPrice, err := strconv.ParseFloat(ticketPriceStr, 32)
+	if ticketPrice != 20 {
+		log.Fatalf("Please enter the correct ticket price i.e $20")
+	}
+
 	// Finally call the grpc method PurchaseTicket
 	response, err := client.PurchaseTicket(context.Background(), &pb.PurchaseTicketRequest{
 		User:        user,
@@ -87,13 +96,15 @@ func GetUsersAndSeatAllocated(client pb.BookingServiceClient) {
 	seatSectionStr, _ := reader.ReadString('\n')
 	seatSectionStr = strings.TrimSpace(seatSectionStr)
 	seatSection := pb.SeatSection(pb.SeatSection_value[strings.ToUpper(seatSectionStr)])
-	log.Println("seatSection : ", seatSection)
 	// Call the grpc method GetUsersAndSeatAllocated
 	response, err := client.GetUsersAndSeatAllocated(context.Background(), &pb.GetUsersAndSeatAllocatedRequest{SeatSection: seatSection})
 	if err != nil {
 		log.Fatalf("Error calling GetUsersAndSeatAllocated : %v", err)
 	}
-	fmt.Printf("\nSeat allocated Details:\n\n%+v\n\n", response)
+	fmt.Printf("\nUser and Seat allocated Details : \n")
+	for _, ticket := range response.SeatAllocated {
+		fmt.Printf("%+v\n", ticket)
+	}
 }
 
 func RemoveUser(client pb.BookingServiceClient) {
